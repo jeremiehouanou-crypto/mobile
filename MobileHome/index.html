@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JY SHOP STORE | Vente de PC HP et PC gamer</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="JY SHOP STORE : PC portables HP bureautiques et gamer, de la 8e à la 13e génération.">
+    <meta name="keywords" content="PC HP, EliteBook, ProBook, PC gamer, ordinateur portable, 8e génération, 13e génération">
+    <meta name="author" content="JY SHOP STORE">
+
+    <!-- TailwindCSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Configuration Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                        'floating': '0 20px 40px -10px rgba(14, 165, 233, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fafafa;
+            color: #334155;
+            overflow-x: hidden;
+        }
+        
+        .hero-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
+            border-color: #e0f2fe;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(to right, #0ea5e9, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300 py-4 px-6 lg:px-12 glass-nav">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="relative w-12 h-12 bg-brand-50 rounded-full flex items-center justify-center overflow-hidden border border-brand-100 group-hover:border-brand-500 transition-colors">
+                    <i class='bx bx-laptop text-2xl text-brand-600'></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-slate-800">
+                    JY SHOP <span class="font-light text-brand-600">STORE</span>
+                </span>
+            </a>
+            
+            <div class="hidden md:flex space-x-8 items-center text-sm font-medium text-slate-600">
+                <a href="#services" class="hover:text-brand-600 transition-colors">Nos Services</a>
+                <a href="#catalogue" class="hover:text-brand-600 transition-colors">Catalogue Premium</a>
+                <a href="#contact" class="hover:text-brand-600 transition-colors">Contact</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="login.php" class="hidden md:flex items-center gap-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-semibold transition-all shadow-md hover:shadow-floating">
+                    <i class='bx bx-log-in-circle text-xl'></i>
+                    <span>Gestion boutique</span>
+                </a>
+                <button class="md:hidden text-2xl text-slate-800">
+                    <i class='bx bx-menu'></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-24 pb-12 px-6 lg:px-12 hero-pattern">
+        <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Contenu Texte -->
+            <div class="space-y-8 z-10">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-xs font-bold tracking-widest uppercase">
+                    <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                    PC HP • 8e à 13e génération
+                </div>
+                
+                <h1 class="text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight">
+                    JY SHOP STORE <br>
+                    <span class="text-gradient">PC HP & gamer</span>
+                </h1>
+                
+                <p class="text-lg lg:text-xl text-slate-500 max-w-xl font-light leading-relaxed">
+                    PC portables HP pour les études et le travail, avec une sélection de PC gamer équipés pour jouer et créer.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 pt-4">
+                    <a href="#catalogue" class="px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-bold text-sm transition-all shadow-md hover:shadow-floating flex items-center gap-2">
+                        Découvrir les offres <i class='bx bx-right-arrow-alt text-xl'></i>
+                    </a>
+                    <a href="#services" class="px-8 py-4 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-full font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
+                        Nos Services
+                    </a>
+                    <a href="https://wa.me/22990389062" target="_blank" rel="noopener" class="px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-sm transition-all shadow-md flex items-center gap-2">
+                        <i class='bx bxl-whatsapp text-xl'></i> WhatsApp
+                    </a>
+                </div>
+                
+                <!-- Trust Indicators -->
+                <div class="pt-8 flex items-center gap-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                            <i class='bx bx-check-shield text-xl text-emerald-500'></i>
+                        </div>
+                        <div class="text-sm">
+                            <p class="font-bold text-slate-800">Garantie</p>
+                            <p class="text-slate-500 text-xs">Sur tous nos appareils</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center">
+                            <i class='bx bx-support text-xl text-indigo-500'></i>
+                        </div>
+                        <div class="text-sm">
+                            <p class="font-bold text-slate-800">Conseil PC</p>
+                            <p class="text-slate-500 text-xs">De la 8e à la 13e génération</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Side -->
+            <div class="relative z-10 flex justify-center lg:justify-end">
+                <div class="relative w-full max-w-md aspect-square bg-gradient-to-tr from-brand-100 to-indigo-50 rounded-full p-8 flex items-center justify-center">
+                    <!-- Utilisation d'une icône stylisée à la place d'une image générique pour un look plus clean et épuré -->
+                    <div class="relative text-center">
+                         <i class='bx bx-laptop text-[180px] text-brand-600 drop-shadow-xl'></i>
+                         <div class="absolute -top-8 -right-8 bg-white p-4 rounded-2xl shadow-soft flex items-center gap-3 border border-slate-100 animate-bounce">
+                             <i class='bx bx-chip text-2xl text-slate-800'></i>
+                             <div class="text-left">
+                                 <p class="text-[10px] text-slate-400 font-bold uppercase">Nouveau</p>
+                                 <p class="text-xs font-bold text-slate-800">Arrivage</p>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee / Bandeau de Marques -->
+    <div class="py-8 bg-brand-50 border-y border-brand-100 overflow-hidden flex relative z-10">
+        <div class="flex space-x-16 whitespace-nowrap px-8 animate-[marquee_20s_linear_infinite]">
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP EliteBook</span>
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP ProBook</span>
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP Pavilion</span>
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP Victus</span>
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP OMEN</span>
+            <!-- Doublon pour fluidité -->
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP EliteBook</span>
+            <span class="text-2xl font-black text-brand-900/40 uppercase tracking-widest">HP Victus</span>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    </style>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 px-6 lg:px-12 relative z-10 bg-white">
+        <div class="max-w-7xl mx-auto space-y-16">
+            <div class="text-center space-y-4">
+                <h2 class="text-sm font-black text-brand-500 uppercase tracking-widest">Notre Expertise</h2>
+                <h3 class="text-3xl md:text-5xl font-black text-slate-900">Un écosystème de <span class="text-gradient">Services</span></h3>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="product-card p-8 rounded-3xl space-y-6 group text-center md:text-left">
+                    <div class="w-16 h-16 mx-auto md:mx-0 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                        <i class='bx bx-store-alt'></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-800">Vente & Conseil</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">
+                        Des PC HP contrôlés, du modèle bureautique au PC gamer. Comparez génération, processeur, mémoire et carte graphique.
+                    </p>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="product-card p-8 rounded-3xl space-y-6 group text-center md:text-left">
+                    <div class="w-16 h-16 mx-auto md:mx-0 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                        <i class='bx bx-transfer-alt'></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-800">PC Gamer</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">
+                        Des configurations avec carte graphique dédiée pour le jeu, la création et les logiciels exigeants.
+                    </p>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="product-card p-8 rounded-3xl space-y-6 group text-center md:text-left">
+                    <div class="w-16 h-16 mx-auto md:mx-0 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                        <i class='bx bx-wrench'></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-800">Conseil informatique</h4>
+                    <p class="text-slate-500 leading-relaxed text-sm">
+                        Nous vous aidons à choisir la génération, la mémoire et la configuration adaptée à votre usage.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catalogue Aperçu Section -->
+    <section id="catalogue" class="py-24 px-6 lg:px-12 bg-slate-50">
+        <div class="max-w-7xl mx-auto space-y-12">
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+                <div class="space-y-4">
+                    <h2 class="text-sm font-black text-brand-500 uppercase tracking-widest">La Collection</h2>
+                    <h3 class="text-3xl md:text-5xl font-black text-slate-900">Notre Catalogue</h3>
+                </div>
+                <a href="#contact" class="text-brand-600 font-bold hover:text-brand-700 transition flex items-center gap-1">
+                    Contactez-nous pour commander <i class='bx bx-right-arrow-alt'></i>
+                </a>
+            </div>
+
+            <div id="catalogue-produits" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" aria-live="polite">
+                <p class="col-span-full py-10 text-center text-slate-500">Chargement du catalogue…</p>
+            </div>
+
+            <div class="hidden grid sm:grid-cols-2 lg:grid-cols-4 gap-6" aria-hidden="true">
+                <!-- Produit 1 -->
+                <div class="product-card rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-48 bg-slate-100 flex items-center justify-center p-6 relative">
+                        <span class="absolute top-4 left-4 bg-white text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-700">HP • 8e gen</span>
+                        <i class='bx bx-laptop text-6xl text-slate-400'></i>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg mb-1">HP EliteBook 840 G5</h4>
+                            <p class="text-xs text-slate-500 mb-4">Core i5 • 8 Go RAM • SSD</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-brand-600 font-black">Nous Consulter</span>
+                            <a href="https://wa.me/22990389062?text=Bonjour%20JY%20SHOP%20STORE%2C%20je%20souhaite%20commander%20le%20HP%20EliteBook%20840%20G5." target="_blank" rel="noopener" aria-label="Commander le HP EliteBook 840 G5 sur WhatsApp" class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
+                                <i class='bx bxl-whatsapp text-xl'></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 2 -->
+                <div class="product-card rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-48 bg-slate-100 flex items-center justify-center p-6 relative">
+                        <span class="absolute top-4 left-4 bg-white text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-700">HP • 10e gen</span>
+                        <i class='bx bx-laptop text-6xl text-slate-400'></i>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg mb-1">HP ProBook 440 G7</h4>
+                            <p class="text-xs text-slate-500 mb-4">Core i5 • 16 Go RAM • SSD</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-brand-600 font-black">Nous Consulter</span>
+                            <a href="https://wa.me/22990389062?text=Bonjour%20JY%20SHOP%20STORE%2C%20je%20souhaite%20commander%20le%20HP%20ProBook%20440%20G7." target="_blank" rel="noopener" aria-label="Commander le HP ProBook 440 G7 sur WhatsApp" class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
+                                <i class='bx bxl-whatsapp text-xl'></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 3 -->
+                <div class="product-card rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-48 bg-slate-100 flex items-center justify-center p-6 relative">
+                        <span class="absolute top-4 left-4 bg-white text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-700">HP • 11e gen</span>
+                        <i class='bx bx-laptop text-6xl text-slate-400'></i>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg mb-1">HP EliteBook 840 G8</h4>
+                            <p class="text-xs text-slate-500 mb-4">Core i5 • 16 Go RAM • SSD</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-brand-600 font-black">Nous Consulter</span>
+                            <a href="https://wa.me/22990389062?text=Bonjour%20JY%20SHOP%20STORE%2C%20je%20souhaite%20commander%20le%20HP%20EliteBook%20840%20G8." target="_blank" rel="noopener" aria-label="Commander le HP EliteBook 840 G8 sur WhatsApp" class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
+                                <i class='bx bxl-whatsapp text-xl'></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 4 -->
+                <div class="product-card rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-48 bg-slate-100 flex items-center justify-center p-6 relative">
+                        <span class="absolute top-4 left-4 bg-white text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-700">HP Gamer</span>
+                        <i class='bx bx-laptop text-6xl text-slate-400'></i>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg mb-1">HP Victus 15</h4>
+                            <p class="text-xs text-slate-500 mb-4">Core i5 • 16 Go RAM • NVIDIA GeForce</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-brand-600 font-black">Nous Consulter</span>
+                            <a href="https://wa.me/22990389062?text=Bonjour%20JY%20SHOP%20STORE%2C%20je%20souhaite%20commander%20le%20HP%20Victus%2015%20gamer." target="_blank" rel="noopener" aria-label="Commander le HP Victus 15 sur WhatsApp" class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
+                                <i class='bx bxl-whatsapp text-xl'></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 5 -->
+                <div class="product-card rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-48 bg-slate-100 flex items-center justify-center p-6 relative">
+                        <span class="absolute top-4 left-4 bg-white text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-700">HP • 13e gen</span>
+                        <i class='bx bx-laptop text-6xl text-slate-400'></i>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg mb-1">HP EliteBook 840 G10</h4>
+                            <p class="text-xs text-slate-500 mb-4">Core i5 13e gen • 16 Go RAM • SSD</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-brand-600 font-black">Nous Consulter</span>
+                            <a href="https://wa.me/22990389062?text=Bonjour%20JY%20SHOP%20STORE%2C%20je%20souhaite%20commander%20le%20HP%20EliteBook%20840%20G10%20de%2013e%20generation." target="_blank" rel="noopener" aria-label="Commander le HP EliteBook 840 G10 sur WhatsApp" class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
+                                <i class='bx bxl-whatsapp text-xl'></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center pt-8">
+                 <p class="text-sm text-slate-500 mb-4">Besoin d'un modèle spécifique ? Nous pouvons le commander pour vous.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Contact -->
+    <footer id="contact" class="bg-slate-900 pt-20 pb-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                
+                <div class="space-y-6 lg:col-span-2">
+                    <a href="#" class="flex items-center gap-3">
+                        <div class="bg-white p-2 rounded-lg">
+                            <i class='bx bx-laptop text-3xl text-brand-600'></i>
+                        </div>
+                        <span class="text-2xl font-bold text-white">JY SHOP <span class="font-light text-brand-400">STORE</span></span>
+                    </a>
+                    <p class="text-slate-400 max-w-sm text-sm leading-relaxed">
+                        Votre boutique de PC portables HP, bureautiques et gamer, des générations 8 à 13.
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-white mb-6 uppercase tracking-wider text-sm">Contact</h5>
+                    <ul class="space-y-4 text-sm text-slate-400">
+                        <li class="flex items-start gap-3">
+                            <i class='bx bx-map text-brand-400 text-xl'></i>
+                            <span>Vente de PC portables HP<br>Contact en boutique</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class='bx bx-phone text-brand-400 text-xl'></i>
+                            <a href="tel:+22990389062" class="hover:text-white transition-colors">+229 90 38 90 62</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-white mb-6 uppercase tracking-wider text-sm">Réseaux Sociaux</h5>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl text-slate-300 hover:text-white hover:bg-brand-600 transition-all"><i class='bx bxl-facebook'></i></a>
+                        <a href="https://wa.me/22990389062" target="_blank" rel="noopener" aria-label="Contacter JY SHOP STORE sur WhatsApp" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl text-slate-300 hover:text-white hover:bg-emerald-500 transition-all"><i class='bx bxl-whatsapp'></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl text-slate-300 hover:text-white hover:bg-pink-600 transition-all"><i class='bx bxl-instagram'></i></a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="pt-8 border-t border-slate-800 text-center flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 font-medium">
+                <p>&copy; 2026 JY SHOP STORE. Tous droits réservés.</p>
+                <a href="login.php" class="hover:text-white transition-colors flex items-center gap-1">
+                    <i class='bx bx-lock-alt'></i> Accès Application (SGC)
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function chargerCataloguePublic() {
+            const catalogue = document.getElementById('catalogue-produits');
+
+            try {
+                const response = await fetch('api.php?action=get_products', {
+                    headers: { Accept: 'application/json' }
+                });
+                if (!response.ok) throw new Error('Impossible de charger le catalogue.');
+
+                const result = await response.json();
+                if (!result.success || !Array.isArray(result.products)) {
+                    throw new Error(result.message || 'Réponse de catalogue invalide.');
+                }
+
+                catalogue.replaceChildren();
+                if (result.products.length === 0) {
+                    const emptyMessage = document.createElement('p');
+                    emptyMessage.className = 'col-span-full py-10 text-center text-slate-500';
+                    emptyMessage.textContent = 'Les nouveaux PC seront bientôt disponibles.';
+                    catalogue.append(emptyMessage);
+                    return;
+                }
+
+                result.products.forEach((product) => {
+                    const productName = product.nom_produit || product.modele_exact || 'PC portable';
+                    const generation = Number(product.generation) || 0;
+                    const specifications = [
+                        product.processeur,
+                        product.stockage_ram,
+                        product.carte_graphique
+                    ].filter(Boolean).join(' • ');
+
+                    const card = document.createElement('article');
+                    card.className = 'product-card rounded-2xl overflow-hidden flex flex-col';
+
+                    const imageFrame = document.createElement('div');
+                    imageFrame.className = 'h-48 bg-slate-100 flex items-center justify-center p-6 relative';
+
+                    const badge = document.createElement('span');
+                    badge.className = 'absolute top-4 left-4 bg-white text-xs font-bold px-2 py-1 rounded shadow-sm text-slate-700';
+                    badge.textContent = `${product.nom_marque || 'PC'}${generation ? ` • ${generation}e gen` : ''}${product.type_pc === 'Gamer' ? ' • Gamer' : ''}`;
+                    imageFrame.append(badge);
+
+                    const placeholder = document.createElement('i');
+                    placeholder.className = 'bx bx-laptop text-6xl text-slate-400';
+                    placeholder.setAttribute('aria-hidden', 'true');
+                    imageFrame.append(placeholder);
+
+                    const imageName = String(product.image_url || '').split(/[\\/]/).pop();
+                    if (imageName) {
+                        const image = document.createElement('img');
+                        image.src = `uploads/${encodeURIComponent(imageName)}`;
+                        image.alt = productName;
+                        image.className = 'absolute inset-0 w-full h-full object-contain p-4 bg-slate-100';
+                        image.addEventListener('error', () => image.remove(), { once: true });
+                        image.addEventListener('load', () => placeholder.classList.add('hidden'), { once: true });
+                        imageFrame.append(image);
+                    }
+
+                    const details = document.createElement('div');
+                    details.className = 'p-5 flex-1 flex flex-col justify-between';
+                    const textBlock = document.createElement('div');
+
+                    const title = document.createElement('h4');
+                    title.className = 'font-bold text-slate-800 text-lg mb-1';
+                    title.textContent = productName;
+                    textBlock.append(title);
+
+                    const specs = document.createElement('p');
+                    specs.className = 'text-xs text-slate-500 mb-4';
+                    specs.textContent = specifications || product.type_pc || 'PC portable HP';
+                    textBlock.append(specs);
+
+                    const description = document.createElement('p');
+                    description.className = 'text-xs text-slate-500 mb-4 line-clamp-2';
+                    description.textContent = product.description || '';
+                    if (description.textContent) textBlock.append(description);
+
+                    const footer = document.createElement('div');
+                    footer.className = 'flex justify-between items-center gap-3';
+                    const price = document.createElement('span');
+                    price.className = 'text-brand-600 font-black';
+                    price.textContent = Number(product.prix_vente) > 0
+                        ? `${new Intl.NumberFormat('fr-FR').format(Number(product.prix_vente))} FCFA`
+                        : 'Nous consulter';
+
+                    const order = document.createElement('a');
+                    order.href = `https://wa.me/22990389062?text=${encodeURIComponent(`Bonjour JY SHOP STORE, je souhaite commander le ${productName}.`)}`;
+                    order.target = '_blank';
+                    order.rel = 'noopener';
+                    order.className = 'w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition';
+                    order.setAttribute('aria-label', `Commander ${productName} sur WhatsApp`);
+                    order.innerHTML = "<i class='bx bxl-whatsapp text-xl' aria-hidden='true'></i>";
+
+                    footer.append(price, order);
+                    details.append(textBlock, footer);
+                    card.append(imageFrame, details);
+                    catalogue.append(card);
+                });
+            } catch (error) {
+                catalogue.replaceChildren();
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'col-span-full py-10 text-center text-slate-500';
+                errorMessage.textContent = 'Le catalogue est momentanément indisponible. Contactez-nous sur WhatsApp.';
+                catalogue.append(errorMessage);
+                console.error(error);
+            }
+        }
+
+        chargerCataloguePublic();
+    </script>
+</body>
+</html>

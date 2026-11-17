@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGC-SMARTPHONE | MOBILE HOME TOGO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            indigo: '#4338ca',
+                            light: '#f4f7fe',
+                            sidebar: '#ffffff',
+                            text: '#2b3674',
+                            muted: '#a3aed1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f4f7fe;
+            color: #2b3674;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 4px;
+        }
+
+        .stat-card {
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .bg-gradient-blue {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+        }
+
+        .bg-gradient-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        }
+
+        .bg-gradient-cyan {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+        }
+
+        .bg-gradient-orange {
+            background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+        }
+
+        /* Toast animation */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideInRight 0.3s ease forwards;
+        }
+
+        /* Print styling for normalized invoice */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #modal-invoice-content, #modal-invoice-content * {
+                visibility: visible;
+            }
+            #modal-invoice-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden font-sans relative">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none max-w-xs sm:max-w-sm"></div>
+
+    <!-- Responsive Sidebar Overlay Backdrop for Mobile -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-black/40 z-30 hidden md:hidden transition-opacity"></div>
+
+    <!-- Sidebar Drawer (Responsive: Collapsible on Mobile, Fixed on Desktop) -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 flex flex-col shadow-lg transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:static md:shadow-none flex-shrink-0">
+        
+        <!-- Logo & Enterprise Branding -->
+        <div class="p-3 sm:p-4 border-b border-gray-50 flex items-center justify-center relative">
+            <div class="flex items-center justify-center cursor-pointer py-1 w-full text-center" onclick="switchTab('dashboard')">
+                <img src="logoMH.png" alt="MOBILE HOME TOGO" class="h-12 sm:h-14 w-auto object-contain max-h-16 mx-auto">
+            </div>
+            <!-- Mobile Close Button -->
+            <button onclick="toggleMobileSidebar(false)" class="md:hidden absolute right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold p-1">
+                &times;
+            </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="flex-1 overflow-y-auto sidebar-scroll py-4 px-3 space-y-3">
+
+            <!-- Section 1: Dashboard & POS -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">VUE D'ENSEMBLE</p>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard"
+                    class="nav-link w-full flex items-center px-3 py-2.5 bg-indigo-50 text-brand-indigo rounded-lg font-medium transition-colors mb-1">
+                    <i class='bx bxs-dashboard text-lg mr-3'></i>
+                    Tableau de Bord
+                </button>
+                <button onclick="switchTab('pos')" id="nav-pos"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors">
+                    <i class='bx bx-laptop text-lg mr-3 text-emerald-600'></i>
+                    Caisse / POS
+                </button>
+            </div>
+
+            <!-- Section 2: Stock & Produits -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">STOCK & LOGISTIQUE</p>
+                <button onclick="switchTab('telephones')" id="nav-telephones"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors mb-1">
+                    <i class='bx bx-devices text-lg mr-3'></i>
+                    Téléphones & IMEI
+                </button>
+                <button onclick="switchTab('stock')" id="nav-stock"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors">
+                    <i class='bx bx-package text-lg mr-3'></i>
+                    Stocks & Mouvements
+                </button>
+            </div>
+
+            <!-- Section 3: Ventes & Transactions -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">VENTES & SERVICES</p>
+                <button onclick="switchTab('ventes')" id="nav-ventes"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors mb-1">
+                    <i class='bx bx-cart text-lg mr-3'></i> Ventes & Factures
+                </button>
+                <button onclick="switchTab('trocs')" id="nav-trocs"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors mb-1">
+                    <i class='bx bx-transfer-alt text-lg mr-3'></i> Trocs & Reprises
+                </button>
+                <button onclick="switchTab('reparations')" id="nav-reparations"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors">
+                    <i class='bx bx-wrench text-lg mr-3'></i> SAV & Réparations
+                </button>
+            </div>
+
+            <!-- Section 4: Partenaires & Tiers -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">TIERS & PARTENAIRES</p>
+                <button onclick="switchTab('clients')" id="nav-clients"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors mb-1">
+                    <i class='bx bx-group text-lg mr-3'></i> Clients
+                </button>
+                <button onclick="switchTab('fournisseurs')" id="nav-fournisseurs"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors">
+                    <i class='bx bxs-truck text-lg mr-3'></i> Fournisseurs
+                </button>
+            </div>
+
+            <!-- Section 5: Management & Administration -->
+            <div>
+                <p class="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">ADMINISTRATION</p>
+                <button onclick="switchTab('finance')" id="nav-finance"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors mb-1">
+                    <i class='bx bx-wallet text-lg mr-3'></i> Finance & Bénéfices
+                </button>
+                <button onclick="switchTab('utilisateurs')" id="nav-utilisateurs"
+                    class="nav-link w-full flex items-center px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-brand-indigo rounded-lg transition-colors">
+                    <i class='bx bx-shield-quarter text-lg mr-3'></i> Utilisateurs & RBAC
+                </button>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden w-full">
+
+        <!-- Topbar Header (Responsive Navigation Bar) -->
+        <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-3 md:px-6 z-20 flex-shrink-0">
+            
+            <!-- Left: Mobile Menu Toggle Button & Global Search -->
+            <div class="flex items-center space-x-2 md:space-x-4 w-full max-w-xs sm:max-w-md">
+                <button onclick="toggleMobileSidebar(true)" class="md:hidden p-2 text-gray-600 hover:text-brand-indigo rounded-lg focus:outline-none">
+                    <i class='bx bx-menu text-2xl'></i>
+                </button>
+
+                <div class="relative w-full">
+                    <i class='bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg'></i>
+                    <input type="text" id="global-search" onkeyup="handleGlobalSearch(this.value)"
+                        placeholder="Rechercher (IMEI, produit, client)..."
+                        class="w-full pl-9 pr-3 py-1.5 sm:pl-10 sm:pr-4 sm:py-2 bg-gray-50 border-none rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-indigo/20">
+                </div>
+            </div>
+
+            <!-- Right: Header Quick Actions & User Info -->
+            <div class="flex items-center space-x-1.5 sm:space-x-3">
+                <button onclick="switchTab('pos')"
+                    class="flex items-center px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-emerald-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-emerald-700 transition-colors shadow-sm">
+                    <i class='bx bx-cart-add text-base sm:text-lg mr-1 sm:mr-1.5'></i>
+                    <span class="hidden sm:inline">Ouvrir Caisse (POS)</span>
+                    <span class="sm:hidden">POS</span>
+                </button>
+
+                <button onclick="openModal('modal-add-troc')"
+                    class="flex items-center px-2.5 py-1.5 sm:px-3 sm:py-2 bg-brand-indigo text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200">
+                    <i class='bx bx-transfer-alt text-base sm:text-lg mr-1 sm:mr-1.5'></i>
+                    <span class="hidden sm:inline">Nouveau Troc</span>
+                    <span class="sm:hidden">Troc</span>
+                </button>
+
+                <div class="h-6 sm:h-8 w-px bg-gray-200 mx-0.5 sm:mx-1"></div>
+
+                <!-- Stock Notifications Alert -->
+                <button onclick="showToast('Alerte Stock: 2 modèles sous le seuil critique (< 3 unités)', 'warning')" class="relative p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class='bx bx-bell text-lg sm:text-xl'></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+
+                <!-- Profile -->
+                <div class="flex items-center cursor-pointer">
+                    <div class="text-right mr-2 hidden lg:block">
+                        <p class="text-xs sm:text-sm font-semibold text-gray-700">Direction Générale</p>
+                        <p class="text-[11px] text-gray-400">Admin Système</p>
+                    </div>
+                    <img src="logoMH.png" alt="MH" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-indigo-200 shadow-xs">
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Responsive Content Body -->
+        <div class="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6" id="content-container">
+
+            <!-- ==================== VIEW 1: TABLEAU DE BORD ==================== -->
+            <div id="view-dashboard" class="tab-view">
+
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-4 sm:mb-6 gap-2">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Tableau de Bord Exécutif</h1>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Aperçu décisionnel de <strong>MOBILE HOME TOGO</strong>.</p>
+                    </div>
+                    <button onclick="showToast('Rapport d\'activité exporté', 'success')"
+                        class="self-start sm:self-auto flex items-center text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 shadow-sm">
+                        <i class='bx bx-export mr-1.5'></i> Exporter Rapport
+                    </button>
+                </div>
+
+                <!-- 5 Key Metrics Cards (Responsive Grid) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+                    <!-- KPI 1: CA du Jour -->
+                    <div class="stat-card bg-gradient-blue rounded-xl p-4 text-white shadow-lg shadow-blue-200/50">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-blue-100 text-[11px] font-semibold uppercase tracking-wider">CA du Jour</p>
+                                <h3 class="text-lg sm:text-xl font-bold mt-0.5">1 240 000 F</h3>
+                            </div>
+                            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <i class='bx bx-money text-lg sm:text-xl'></i>
+                            </div>
+                        </div>
+                        <div class="h-8 relative">
+                            <canvas id="sparkline1"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: Bénéfice Net -->
+                    <div class="stat-card bg-gradient-purple rounded-xl p-4 text-white shadow-lg shadow-purple-200/50">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-purple-100 text-[11px] font-semibold uppercase tracking-wider">Bénéfice Net</p>
+                                <h3 class="text-lg sm:text-xl font-bold mt-0.5">315 000 F</h3>
+                            </div>
+                            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <i class='bx bx-wallet text-lg sm:text-xl'></i>
+                            </div>
+                        </div>
+                        <div class="h-8 relative">
+                            <canvas id="sparkline2"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Total Stock -->
+                    <div class="stat-card bg-gradient-cyan rounded-xl p-4 text-white shadow-lg shadow-cyan-200/50">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-cyan-100 text-[11px] font-semibold uppercase tracking-wider">Stock Appareils</p>
+                                <h3 class="text-lg sm:text-xl font-bold mt-0.5">262 Unités</h3>
+                            </div>
+                            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <i class='bx bx-devices text-lg sm:text-xl'></i>
+                            </div>
+                        </div>
+                        <div class="h-8 relative">
+                            <canvas id="sparkline3"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Total Clients -->
+                    <div class="stat-card bg-gradient-orange rounded-xl p-4 text-white shadow-lg shadow-orange-200/50">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <p class="text-orange-100 text-[11px] font-semibold uppercase tracking-wider">Total Clients</p>
+                                <h3 class="text-lg sm:text-xl font-bold mt-0.5">1 405</h3>
+                            </div>
+                            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <i class='bx bx-group text-lg sm:text-xl'></i>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-white/80 mt-1 font-medium">+8 cette semaine</p>
+                    </div>
+
+                    <!-- KPI 5: Ventes Exécutées -->
+                    <div class="stat-card bg-slate-900 rounded-xl p-4 text-white shadow-lg shadow-slate-300 sm:col-span-2 lg:col-span-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="text-slate-400 text-[11px] font-semibold uppercase tracking-wider">Ventes du jour</p>
+                                <h3 class="text-lg sm:text-xl font-bold mt-0.5 text-emerald-400">14 Ventes</h3>
+                            </div>
+                            <div class="p-2 bg-white/10 rounded-lg">
+                                <i class='bx bx-cart text-lg sm:text-xl'></i>
+                            </div>
+                        </div>
+                        <button onclick="switchTab('pos')" class="mt-2 w-full py-1 text-xs bg-brand-indigo hover:bg-indigo-700 rounded font-medium transition text-white">
+                            Ouvrir Caisse
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+                    <!-- Line Chart -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-sm sm:text-base font-bold text-gray-800">Évolution des Revenus Mensuels</h2>
+                            <span class="text-xs font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded">2026</span>
+                        </div>
+                        <div class="h-48 sm:h-64 relative w-full">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Donut Chart -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 flex flex-col justify-between">
+                        <h2 class="text-sm sm:text-base font-bold text-gray-800 mb-2">Ventilation par Marque</h2>
+                        <div class="h-40 sm:h-44 relative w-full flex justify-center items-center">
+                            <canvas id="donutChart"></canvas>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-2 text-xs font-medium text-gray-600">
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-black mr-1.5"></span>Apple (40%)</div>
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-brand-indigo mr-1.5"></span>Samsung (30%)</div>
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 mr-1.5"></span>Xiaomi (20%)</div>
+                            <div class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span>Pixel (10%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tables Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 pb-6">
+                    <!-- Table 1: Alertes Stock Faible -->
+                    <div class="bg-white rounded-xl shadow-sm border border-red-100 overflow-hidden">
+                        <div class="p-3 sm:p-4 border-b border-gray-100 bg-red-50/40 flex justify-between items-center">
+                            <h2 class="text-xs sm:text-sm font-bold text-gray-800 flex items-center">
+                                <i class='bx bx-error text-red-500 text-base sm:text-lg mr-1.5'></i> Alertes Stock Faible (< 3)
+                            </h2>
+                            <button onclick="switchTab('stock')" class="text-xs text-brand-indigo font-medium hover:underline">+ Approvisionner</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[400px]">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider">
+                                        <th class="px-4 py-2.5 font-medium">Modèle Exact</th>
+                                        <th class="px-4 py-2.5 font-medium text-center">Stock</th>
+                                        <th class="px-4 py-2.5 font-medium text-right">Prix Vente</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-xs sm:text-sm text-gray-600 divide-y divide-gray-50">
+                                    <tr>
+                                        <td class="px-4 py-3 font-semibold text-gray-800">Redmi 14C (256Go / 6Go)</td>
+                                        <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-xs">2 restants</span></td>
+                                        <td class="px-4 py-3 text-right font-bold text-brand-indigo">60 000 F CFA</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 font-semibold text-gray-800">Samsung Galaxy S23 Ultra</td>
+                                        <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 bg-red-100 text-red-700 font-bold rounded text-xs">1 restant</span></td>
+                                        <td class="px-4 py-3 text-right font-bold text-brand-indigo">590 000 F CFA</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table 2: Transactions Récentes (POS) -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-3 sm:p-4 border-b border-gray-100 flex justify-between items-center">
+                            <h2 class="text-xs sm:text-sm font-bold text-gray-800">Transactions Récentes (POS)</h2>
+                            <button onclick="switchTab('ventes')" class="text-xs text-brand-indigo font-medium hover:underline">Historique</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[400px]">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider">
+                                        <th class="px-4 py-2.5 font-medium">Facture</th>
+                                        <th class="px-4 py-2.5 font-medium">Règlement</th>
+                                        <th class="px-4 py-2.5 font-medium text-right">Montant TTC</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-xs sm:text-sm text-gray-600 divide-y divide-gray-50">
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-brand-indigo">FAC-2026-1024</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-semibold">T-Money</span></td>
+                                        <td class="px-4 py-3 text-right font-bold text-gray-800">169 000 F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-brand-indigo">FAC-2026-1023</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs font-semibold">Flooz</span></td>
+                                        <td class="px-4 py-3 text-right font-bold text-gray-800">590 000 F</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-brand-indigo">FAC-2026-1022</td>
+                                        <td class="px-4 py-3"><span class="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-semibold">Espèces</span></td>
+                                        <td class="px-4 py-3 text-right font-bold text-gray-800">135 000 F</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-[11px] text-gray-400 mt-2 mb-4">© 2026 MOBILE HOME TOGO • SGC-SMARTPHONE v1.0</p>
+            </div>
+
+            <!-- ==================== VIEW 2: TERMINAL DE VENTE / CAISSE (POS) ==================== -->
+            <div id="view-pos" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Terminal de Vente & Caisse (POS)</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Sélectionnez les smartphones ou accessoires et encaissez instantanément.</p>
+                    </div>
+                    <span class="self-start sm:self-auto px-2.5 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-ping"></span> Caisse Ouverte
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <!-- Product Catalog -->
+                    <div class="lg:col-span-2 space-y-3 sm:space-y-4">
+                        <!-- Category Filters -->
+                        <div class="flex space-x-1.5 overflow-x-auto pb-1">
+                            <button onclick="filterPosCategory('all')" class="px-3 py-1.5 bg-brand-indigo text-white rounded-lg text-xs font-semibold flex-shrink-0">Tous</button>
+                            <button onclick="filterPosCategory('xiaomi')" class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-50 flex-shrink-0">Xiaomi / Redmi</button>
+                            <button onclick="filterPosCategory('apple')" class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-50 flex-shrink-0">Apple iPhone</button>
+                            <button onclick="filterPosCategory('samsung')" class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-50 flex-shrink-0">Samsung Galaxy</button>
+                            <button onclick="filterPosCategory('pixel')" class="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-50 flex-shrink-0">Google Pixel</button>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4" id="pos-products-grid">
+                            <!-- Product 1 -->
+                            <div class="pos-item bg-white p-3.5 sm:p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-brand-indigo transition" data-cat="xiaomi" onclick="addToCart('Xiaomi 17 Pro Max (512Go/16Go)', 590000, 'IMEI-8649201948201')">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded">Xiaomi High-End</span>
+                                    <h4 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5">Xiaomi 17 Pro Max</h4>
+                                    <p class="text-[11px] text-gray-400">512 Go / 16 Go RAM • 5G</p>
+                                </div>
+                                <div class="mt-3 flex justify-between items-center border-t border-gray-50 pt-2">
+                                    <span class="font-bold text-brand-indigo text-xs sm:text-sm">590 000 F</span>
+                                    <button class="p-1 bg-indigo-50 text-brand-indigo rounded hover:bg-brand-indigo hover:text-white"><i class='bx bx-plus text-base'></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Product 2 -->
+                            <div class="pos-item bg-white p-3.5 sm:p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-brand-indigo transition" data-cat="xiaomi" onclick="addToCart('Redmi Note 15 Pro (256Go/8Go)', 165000, 'IMEI-8649201948202')">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded">Redmi Note 15</span>
+                                    <h4 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5">Redmi Note 15 Pro</h4>
+                                    <p class="text-[11px] text-gray-400">256 Go / 8 Go RAM • 5G</p>
+                                </div>
+                                <div class="mt-3 flex justify-between items-center border-t border-gray-50 pt-2">
+                                    <span class="font-bold text-brand-indigo text-xs sm:text-sm">165 000 F</span>
+                                    <button class="p-1 bg-indigo-50 text-brand-indigo rounded hover:bg-brand-indigo hover:text-white"><i class='bx bx-plus text-base'></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Product 3 -->
+                            <div class="pos-item bg-white p-3.5 sm:p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-brand-indigo transition" data-cat="xiaomi" onclick="addToCart('Redmi 14C (256Go/6Go)', 60000, 'IMEI-8649201948203')">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded">Alerte Stock (2)</span>
+                                    <h4 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5">Redmi 14C</h4>
+                                    <p class="text-[11px] text-gray-400">256 Go / 6 Go RAM • 4G</p>
+                                </div>
+                                <div class="mt-3 flex justify-between items-center border-t border-gray-50 pt-2">
+                                    <span class="font-bold text-brand-indigo text-xs sm:text-sm">60 000 F</span>
+                                    <button class="p-1 bg-indigo-50 text-brand-indigo rounded hover:bg-brand-indigo hover:text-white"><i class='bx bx-plus text-base'></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Product 4 -->
+                            <div class="pos-item bg-white p-3.5 sm:p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-brand-indigo transition" data-cat="apple" onclick="addToCart('iPhone 16 Pro Max 256Go (Neuf Scellé)', 980000, 'IMEI-3549201948204')">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-black text-white text-[10px] font-bold rounded">Apple Neuf</span>
+                                    <h4 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5">iPhone 16 Pro Max</h4>
+                                    <p class="text-[11px] text-gray-400">256 Go • Titane Désert</p>
+                                </div>
+                                <div class="mt-3 flex justify-between items-center border-t border-gray-50 pt-2">
+                                    <span class="font-bold text-brand-indigo text-xs sm:text-sm">980 000 F</span>
+                                    <button class="p-1 bg-indigo-50 text-brand-indigo rounded hover:bg-brand-indigo hover:text-white"><i class='bx bx-plus text-base'></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Product 5 -->
+                            <div class="pos-item bg-white p-3.5 sm:p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-brand-indigo transition" data-cat="samsung" onclick="addToCart('Samsung Galaxy S24 Ultra (512Go)', 790000, 'IMEI-3581029482910')">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">Série S</span>
+                                    <h4 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5">Galaxy S24 Ultra</h4>
+                                    <p class="text-[11px] text-gray-400">512 Go • Titanium Gray</p>
+                                </div>
+                                <div class="mt-3 flex justify-between items-center border-t border-gray-50 pt-2">
+                                    <span class="font-bold text-brand-indigo text-xs sm:text-sm">790 000 F</span>
+                                    <button class="p-1 bg-indigo-50 text-brand-indigo rounded hover:bg-brand-indigo hover:text-white"><i class='bx bx-plus text-base'></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Product 6 -->
+                            <div class="pos-item bg-white p-3.5 sm:p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between cursor-pointer hover:border-brand-indigo transition" data-cat="pixel" onclick="addToCart('Google Pixel 9 Pro (256Go)', 550000, 'IMEI-3591029482910')">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">Google Pixel</span>
+                                    <h4 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5">Pixel 9 Pro</h4>
+                                    <p class="text-[11px] text-gray-400">256 Go • Porcelaine</p>
+                                </div>
+                                <div class="mt-3 flex justify-between items-center border-t border-gray-50 pt-2">
+                                    <span class="font-bold text-brand-indigo text-xs sm:text-sm">550 000 F</span>
+                                    <button class="p-1 bg-indigo-50 text-brand-indigo rounded hover:bg-brand-indigo hover:text-white"><i class='bx bx-plus text-base'></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right POS Cart & Checkout -->
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                                <h3 class="font-bold text-gray-800 text-xs sm:text-sm flex items-center">
+                                    <i class='bx bx-shopping-bag text-brand-indigo text-lg mr-1.5'></i> Panier de Vente
+                                </h3>
+                                <button onclick="clearCart()" class="text-xs text-red-500 hover:underline">Vider</button>
+                            </div>
+
+                            <!-- Customer selector -->
+                            <div class="mt-3">
+                                <label class="text-xs font-semibold text-gray-600 block mb-1">Attribution Client :</label>
+                                <select id="pos-customer-select" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none">
+                                    <option value="Client de Passage">Client de Passage (Anonyme)</option>
+                                    <option value="Bamba Fatoumata (+228 90 12 34 56)">Bamba Fatoumata (+228 90 12 34 56)</option>
+                                    <option value="Diallo Moussa (+228 99 88 77 66)">Diallo Moussa (+228 99 88 77 66)</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-3 max-h-48 sm:max-h-56 overflow-y-auto pr-1 space-y-2" id="cart-items-container">
+                                <p class="text-xs text-gray-400 text-center py-6 italic">Aucun article sélectionné.<br>Cliquez sur un produit pour l'ajouter.</p>
+                            </div>
+                        </div>
+
+                        <!-- Multi-mode Payment -->
+                        <div class="border-t border-gray-100 pt-3 space-y-3">
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 block mb-1">Mode d'Encaissement :</label>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <button onclick="selectPaymentMethod('Espèces')" id="pay-Espèces" class="pay-btn p-1.5 border border-brand-indigo bg-indigo-50 text-brand-indigo rounded text-xs font-bold">Espèces</button>
+                                    <button onclick="selectPaymentMethod('T-Money')" id="pay-TMoney" class="pay-btn p-1.5 border border-gray-200 text-gray-600 rounded text-xs font-bold">T-Money</button>
+                                    <button onclick="selectPaymentMethod('Flooz')" id="pay-Flooz" class="pay-btn p-1.5 border border-gray-200 text-gray-600 rounded text-xs font-bold">Flooz</button>
+                                    <button onclick="selectPaymentMethod('Carte Bancaire')" id="pay-CarteBancaire" class="pay-btn p-1.5 border border-gray-200 text-gray-600 rounded text-xs font-bold">Carte Bancaire</button>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-2.5 rounded-lg space-y-1 text-xs">
+                                <div class="flex justify-between text-gray-500"><span>Sous-total</span><span id="pos-subtotal">0 F</span></div>
+                                <div class="flex justify-between font-bold text-xs sm:text-sm text-gray-800 border-t border-gray-200 pt-1">
+                                    <span>TOTAL TTC</span>
+                                    <span id="pos-total" class="text-brand-indigo font-black">0 F CFA</span>
+                                </div>
+                            </div>
+
+                            <button onclick="checkoutPOS()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-sm transition">
+                                Valider & Imprimer Reçu Normalisé
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 3: TÉLÉPHONES & CATALOGUE ==================== -->
+            <div id="view-telephones" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Catalogue des Produits & Données de Référence</h1>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Gammes Xiaomi, Apple, Samsung et Google Pixel avec garantie.</p>
+                    </div>
+                    <button onclick="openModal('modal-add-phone')"
+                        class="self-start sm:self-auto flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-brand-indigo text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        <i class='bx bx-plus mr-1.5 text-base sm:text-lg'></i> Ajouter au Catalogue
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-3 sm:p-4 border-b border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-gray-50/50">
+                        <input type="text" onkeyup="filterTable('table-telephones', this.value)" placeholder="Filtrer par modèle, série, réseau..."
+                            class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-brand-indigo/20">
+                        <span class="text-xs font-semibold text-gray-500">262 produits référencés</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]" id="table-telephones">
+                            <thead>
+                                <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider">
+                                    <th class="px-4 py-2.5 sm:px-5 sm:py-3 font-medium">Série</th>
+                                    <th class="px-4 py-2.5 sm:px-5 sm:py-3 font-medium">Modèle Exact</th>
+                                    <th class="px-4 py-2.5 sm:px-5 sm:py-3 font-medium">Stockage / RAM</th>
+                                    <th class="px-4 py-2.5 sm:px-5 sm:py-3 font-medium">Réseau</th>
+                                    <th class="px-4 py-2.5 sm:px-5 sm:py-3 font-medium">Prix Référence (FCFA)</th>
+                                    <th class="px-4 py-2.5 sm:px-5 sm:py-3 font-medium">Garantie</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs sm:text-sm text-gray-600 divide-y divide-gray-50">
+                                <tr>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-semibold text-gray-800">Xiaomi High-End</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-brand-indigo">Xiaomi 17 Pro Max</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4">512 Go / 16 Go</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded text-xs">5G</span></td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-gray-800">590 000 FCFA</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 text-xs font-semibold text-green-600">12 Mois</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-semibold text-gray-800">Xiaomi High-End</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-brand-indigo">Xiaomi 17 Ultra</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4">512 Go / 16 Go</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded text-xs">5G</span></td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-gray-800">650 000 FCFA</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 text-xs font-semibold text-green-600">12 Mois</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-semibold text-gray-800">Série Note 15</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-brand-indigo">Redmi Note 15 Pro Plus</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4">256 Go / 8 Go</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4"><span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded text-xs">5G</span></td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-gray-800">250 000 FCFA</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 text-xs font-semibold text-green-600">12 Mois</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-semibold text-gray-800">Série Note 14</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-brand-indigo">Redmi 14C</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4">256 Go / 6 Go</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4"><span class="px-2 py-0.5 bg-gray-100 text-gray-600 font-bold rounded text-xs">4G</span></td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 font-bold text-gray-800">60 000 FCFA</td>
+                                    <td class="px-4 py-3 sm:px-5 sm:py-4 text-xs font-semibold text-green-600">12 Mois</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 4: STOCKS & MOUVEMENTS ==================== -->
+            <div id="view-stock" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Gestion des Stocks & Mouvements</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Entrées fournisseurs, sorties de caisse et inventaires.</p>
+                    </div>
+                    <button onclick="openModal('modal-add-phone')"
+                        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-brand-indigo text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        <i class='bx bx-package mr-1.5'></i> Approvisionnement
+                    </button>
+                </div>
+
+                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100 space-y-3">
+                    <h2 class="text-xs sm:text-sm font-bold text-gray-800">Journal des Mouvements Récents</h2>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-3 bg-gray-50 rounded-lg flex justify-between items-center">
+                            <div>
+                                <p class="font-bold text-gray-800">Entrée Réception Lot Xiaomi & Redmi</p>
+                                <p class="text-gray-400">Arrivage Fournisseur • Enregistré par Gestionnaire de Stock</p>
+                            </div>
+                            <span class="font-bold text-green-600">+25 Unités</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 5: VENTES & FACTURES ==================== -->
+            <div id="view-ventes" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Historique des Ventes & Factures</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Consultation et dupli de reçu normalisé émis par MOBILE HOME TOGO.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider">
+                                    <th class="px-4 py-2.5 font-medium">Facture N°</th>
+                                    <th class="px-4 py-2.5 font-medium">Client</th>
+                                    <th class="px-4 py-2.5 font-medium">Mode Règlement</th>
+                                    <th class="px-4 py-2.5 font-medium text-right">Total TTC</th>
+                                    <th class="px-4 py-2.5 font-medium text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs sm:text-sm text-gray-600 divide-y divide-gray-50">
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-brand-indigo">FAC-2026-1024</td>
+                                    <td class="px-4 py-3 font-medium text-gray-800">Bamba Fatoumata</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs font-semibold">T-Money</span></td>
+                                    <td class="px-4 py-3 text-right font-bold text-gray-800">169 000 F</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <button onclick="openModal('modal-invoice')" class="px-2.5 py-1 bg-indigo-50 text-brand-indigo hover:bg-brand-indigo hover:text-white rounded text-xs font-semibold">Duplicata</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 6: TROCS ==================== -->
+            <div id="view-trocs" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Service de Trocs & Reprises</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Reprise d'anciens téléphones et calcul automatique de soulte.</p>
+                    </div>
+                    <button onclick="openModal('modal-add-troc')"
+                        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-brand-indigo text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        <i class='bx bx-transfer-alt mr-1.5'></i> Nouveau Troc
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 7: SAV & RÉPARATIONS ==================== -->
+            <div id="view-reparations" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">SAV & Atelier de Réparations</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Prise en charge technique des smartphones cassés ou défaillants.</p>
+                    </div>
+                    <button onclick="openModal('modal-add-repair')"
+                        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-brand-indigo text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        <i class='bx bx-wrench mr-1.5'></i> Fiche Réparation
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 8: CLIENTS ==================== -->
+            <div id="view-clients" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Gestion de la Clientèle</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Profils clients, cumuls d'achats et fiches de contacts.</p>
+                    </div>
+                    <button onclick="openModal('modal-add-client')"
+                        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-brand-indigo text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        <i class='bx bx-user-plus mr-1.5'></i> Nouveau Client
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 9: FOURNISSEURS ==================== -->
+            <div id="view-fournisseurs" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Répertoire des Fournisseurs</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Grossistes et partenaires d'importation (Dubai, Chine, Europe).</p>
+                    </div>
+                </div>
+                <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500">Grossistes agréés : Dubai Wholesale LLC, Xiaomi Direct Togo, Apple Certified Rep.</p>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 10: FINANCE ==================== -->
+            <div id="view-finance" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Finance & Bénéfices</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Chiffre d'Affaires, marge brute et résultat net d'exploitation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 11: UTILISATEURS & RBAC ==================== -->
+            <div id="view-utilisateurs" class="tab-view hidden space-y-4 sm:space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Gestion des Utilisateurs & Droits (RBAC)</h1>
+                        <p class="text-xs sm:text-sm text-gray-500">Attribution des rôles : Administrateur, Vendeur, Gestionnaire de Stock.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[500px]">
+                            <thead>
+                                <tr class="bg-gray-50/50 text-xs text-gray-400 uppercase tracking-wider">
+                                    <th class="px-4 py-2.5 font-medium">Nom & Identifiant</th>
+                                    <th class="px-4 py-2.5 font-medium">Rôle (Droits d'Accès)</th>
+                                    <th class="px-4 py-2.5 font-medium">Périmètre d'Accès</th>
+                                    <th class="px-4 py-2.5 font-medium">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs sm:text-sm text-gray-600 divide-y divide-gray-50">
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-gray-800">Direction / Admin (admin)</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs font-bold">Administrateur</span></td>
+                                    <td class="px-4 py-3 text-xs text-gray-500">Accès total (Finances, modification des prix, utilisateurs)</td>
+                                    <td class="px-4 py-3"><span class="text-green-600 font-bold text-xs">Actif</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-gray-800">Caissier / Vendeur (vendeur)</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs font-bold">Vendeur</span></td>
+                                    <td class="px-4 py-3 text-xs text-gray-500">Accès restreint au catalogue, à la caisse (POS) et fiches clients</td>
+                                    <td class="px-4 py-3"><span class="text-green-600 font-bold text-xs">Actif</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-bold text-gray-800">Stockiste / Logistique</td>
+                                    <td class="px-4 py-3"><span class="px-2 py-0.5 bg-amber-50 text-amber-700 rounded text-xs font-bold">Gestionnaire de Stock</span></td>
+                                    <td class="px-4 py-3 text-xs text-gray-500">Accès aux entrées/sorties, réapprovisionnements et fournisseurs</td>
+                                    <td class="px-4 py-3"><span class="text-green-600 font-bold text-xs">Actif</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ==================== RESPONSIVE MODALS ==================== -->
+
+    <!-- Modal 1: Ajouter Téléphone -->
+    <div id="modal-add-phone" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-xl space-y-3 sm:space-y-4 my-auto">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-gray-800 text-sm sm:text-base">Ajouter un Smartphone au Catalogue</h3>
+                <button onclick="closeModal('modal-add-phone')" class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1">&times;</button>
+            </div>
+            <form onsubmit="submitForm(event, 'modal-add-phone', 'Appareil ajouté au catalogue !')" class="space-y-3 text-xs">
+                <div>
+                    <label class="font-semibold text-gray-700 block mb-1">Modèle Exact :</label>
+                    <input type="text" required placeholder="ex: Xiaomi 17 Pro Max" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div>
+                        <label class="font-semibold text-gray-700 block mb-1">Stockage / RAM :</label>
+                        <input type="text" required placeholder="512 Go / 16 Go" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-700 block mb-1">Réseau :</label>
+                        <select class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
+                            <option>5G</option>
+                            <option>4G/5G</option>
+                            <option>4G</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="font-semibold text-gray-700 block mb-1">Prix de Référence (FCFA) :</label>
+                    <input type="number" required placeholder="590000" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-brand-indigo font-bold outline-none">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-phone')" class="w-1/2 py-2 bg-gray-100 text-gray-600 font-semibold rounded-lg">Annuler</button>
+                    <button type="submit" class="w-1/2 py-2 bg-brand-indigo text-white font-semibold rounded-lg shadow-sm">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Facture Normalisée MOBILE HOME TOGO -->
+    <div id="modal-invoice" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-xl space-y-3 sm:space-y-4 my-auto">
+            <div id="modal-invoice-content" class="space-y-3 text-xs bg-white p-1 sm:p-2 text-gray-800">
+                <div class="text-center border-b border-gray-100 pb-3">
+                    <img src="logoMH.png" alt="Logo MOBILE HOME TOGO" class="h-12 mx-auto mb-1.5 object-contain">
+                    <h2 class="text-base font-extrabold text-brand-indigo tracking-tight">MOBILE HOME TOGO</h2>
+                    <p class="text-[11px] font-bold text-gray-500">« Le meilleur sinon rien »</p>
+                    <p class="text-[10px] text-gray-400">Total, zone pharmacie NATION, en face de BAMACCO, Lomé</p>
+                    <p class="text-[10px] text-gray-400">Tél: +228 96 39 37 80 / +228 71 55 11 95</p>
+                    <span class="inline-block mt-2 px-2.5 py-0.5 bg-gray-100 text-gray-700 font-mono text-[11px] font-bold rounded" id="inv-ref">FAC-2026-1024</span>
+                </div>
+
+                <div class="flex justify-between text-gray-500">
+                    <span>Date: <strong class="text-gray-800" id="inv-date">28/07/2026</strong></span>
+                    <span>Client: <strong class="text-gray-800" id="inv-client">Bamba Fatoumata</strong></span>
+                </div>
+
+                <div class="border-t border-b border-gray-100 py-2 space-y-1" id="inv-items-list">
+                    <div class="flex justify-between font-bold">
+                        <span>Xiaomi 17 Pro Max (512Go/16Go)</span>
+                        <span class="text-brand-indigo">590 000 F</span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-2 flex justify-between font-bold text-xs sm:text-sm text-brand-indigo">
+                    <span>TOTAL REGLÉ</span>
+                    <span id="inv-total">590 000 FCFA</span>
+                </div>
+
+                <p class="text-center text-[10px] text-gray-400 italic pt-2">Merci pour votre achat chez Mobile Home Togo ! Garantie officielle incluse.</p>
+            </div>
+
+            <div class="flex space-x-3 pt-2 no-print">
+                <button onclick="closeModal('modal-invoice')" class="w-1/2 py-2 bg-gray-100 text-gray-600 font-semibold rounded-lg text-xs">Fermer</button>
+                <button onclick="window.print()" class="w-1/2 py-2 bg-brand-indigo text-white font-semibold rounded-lg text-xs shadow-sm flex items-center justify-center">
+                    <i class='bx bx-printer mr-1.5 text-sm'></i> Imprimer Reçu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Nouveau Troc -->
+    <div id="modal-add-troc" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-xl space-y-3 sm:space-y-4 my-auto">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-gray-800 text-sm sm:text-base">Enregistrer un Troc</h3>
+                <button onclick="closeModal('modal-add-troc')" class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1">&times;</button>
+            </div>
+            <form onsubmit="submitForm(event, 'modal-add-troc', 'Troc enregistré avec succès !')" class="space-y-3 text-xs">
+                <div><label class="font-semibold text-gray-700 block mb-1">Client :</label><input type="text" required placeholder="Nom du client" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none"></div>
+                <div class="p-2.5 sm:p-3 bg-amber-50/60 rounded-lg border border-amber-100 space-y-1">
+                    <p class="font-bold text-amber-800">Appareil Repris</p>
+                    <input type="text" required placeholder="Modèle d'occasion" class="w-full p-2 bg-white border border-gray-200 rounded-lg">
+                    <input type="number" required placeholder="Valeur d'estimation (FCFA)" class="w-full p-2 bg-white border border-gray-200 rounded-lg font-bold">
+                </div>
+                <div class="p-2.5 sm:p-3 bg-indigo-50/60 rounded-lg border border-indigo-100 space-y-1">
+                    <p class="font-bold text-brand-indigo">Nouveau Téléphone Pris</p>
+                    <input type="text" required placeholder="Nouveau modèle" class="w-full p-2 bg-white border border-gray-200 rounded-lg">
+                    <input type="number" required placeholder="Prix de vente (FCFA)" class="w-full p-2 bg-white border border-gray-200 rounded-lg font-bold">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-troc')" class="w-1/2 py-2 bg-gray-100 text-gray-600 font-semibold rounded-lg">Annuler</button>
+                    <button type="submit" class="w-1/2 py-2 bg-brand-indigo text-white font-semibold rounded-lg shadow-sm">Valider Troc</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Nouveau Client -->
+    <div id="modal-add-client" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-xl space-y-3 sm:space-y-4 my-auto">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-gray-800 text-sm sm:text-base">Nouveau Client</h3>
+                <button onclick="closeModal('modal-add-client')" class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1">&times;</button>
+            </div>
+            <form onsubmit="submitForm(event, 'modal-add-client', 'Client ajouté au répertoire !')" class="space-y-3 text-xs">
+                <div><label class="font-semibold text-gray-700 block mb-1">Nom & Prénom :</label><input type="text" required placeholder="ex: Koffi Lawson" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none"></div>
+                <div><label class="font-semibold text-gray-700 block mb-1">Téléphone :</label><input type="text" required placeholder="+228 96 39 37 80" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none"></div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-client')" class="w-1/2 py-2 bg-gray-100 text-gray-600 font-semibold rounded-lg">Annuler</button>
+                    <button type="submit" class="w-1/2 py-2 bg-brand-indigo text-white font-semibold rounded-lg shadow-sm">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 5: Nouvelle Réparation -->
+    <div id="modal-add-repair" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-xl space-y-3 sm:space-y-4 my-auto">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-gray-800 text-sm sm:text-base">Prise en Charge Réparation SAV</h3>
+                <button onclick="closeModal('modal-add-repair')" class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1">&times;</button>
+            </div>
+            <form onsubmit="submitForm(event, 'modal-add-repair', 'Ticket réparation ouvert !')" class="space-y-3 text-xs">
+                <div><label class="font-semibold text-gray-700 block mb-1">Nom Client :</label><input type="text" required placeholder="Nom du client" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none"></div>
+                <div><label class="font-semibold text-gray-700 block mb-1">Description Panne :</label><textarea required placeholder="ex: Remplacement vitre tactile" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg outline-none" rows="2"></textarea></div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-add-repair')" class="w-1/2 py-2 bg-gray-100 text-gray-600 font-semibold rounded-lg">Annuler</button>
+                    <button type="submit" class="w-1/2 py-2 bg-brand-indigo text-white font-semibold rounded-lg shadow-sm">Créer Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        // 1. Mobile Sidebar Toggle Drawer
+        function toggleMobileSidebar(show) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (show) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // 2. SPA Navigation System
+        function switchTab(tabId) {
+            // Close mobile sidebar if open
+            toggleMobileSidebar(false);
+
+            const views = document.querySelectorAll('.tab-view');
+            views.forEach(v => v.classList.add('hidden'));
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('bg-indigo-50', 'text-brand-indigo', 'font-medium');
+                link.classList.add('text-gray-600', 'hover:bg-gray-50');
+            });
+
+            const targetView = document.getElementById('view-' + tabId);
+            if (targetView) targetView.classList.remove('hidden');
+
+            const activeNav = document.getElementById('nav-' + tabId);
+            if (activeNav) {
+                activeNav.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                activeNav.classList.add('bg-indigo-50', 'text-brand-indigo', 'font-medium');
+            }
+
+            document.getElementById('content-container').scrollTop = 0;
+        }
+
+        // 3. Modals Control
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function submitForm(e, modalId, message) {
+            e.preventDefault();
+            closeModal(modalId);
+            showToast(message, 'success');
+        }
+
+        // 4. Toast Notifications
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bg = 'bg-gray-800 text-white';
+            if (type === 'success') bg = 'bg-indigo-600 text-white';
+            if (type === 'warning') bg = 'bg-orange-500 text-white';
+
+            toast.className = `toast-animate ${bg} px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-lg text-xs font-semibold flex items-center space-x-2 pointer-events-auto`;
+            toast.innerHTML = `<span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3200);
+        }
+
+        // 5. POS Cart Management
+        let cart = [];
+        let selectedPaymentMode = 'Espèces';
+
+        function addToCart(title, price, imei = '') {
+            const existing = cart.find(item => item.title === title && item.imei === imei);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ title, price, imei, qty: 1 });
+            }
+            renderCart();
+            showToast(`${title} ajouté au panier`, 'success');
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function updateCartQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            renderCart();
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        function selectPaymentMethod(mode) {
+            selectedPaymentMode = mode;
+            document.querySelectorAll('.pay-btn').forEach(btn => {
+                btn.classList.remove('border-brand-indigo', 'bg-indigo-50', 'text-brand-indigo');
+                btn.classList.add('border-gray-200', 'text-gray-600');
+            });
+            const selectedBtn = document.getElementById('pay-' + mode.replace(/\s+/g, ''));
+            if (selectedBtn) {
+                selectedBtn.classList.add('border-brand-indigo', 'bg-indigo-50', 'text-brand-indigo');
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const subtotalEl = document.getElementById('pos-subtotal');
+            const totalEl = document.getElementById('pos-total');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-6 italic">Aucun article sélectionné.<br>Cliquez sur un produit pour l'ajouter.</p>`;
+                subtotalEl.innerText = '0 F';
+                totalEl.innerText = '0 F CFA';
+                return;
+            }
+
+            let total = 0;
+            let html = '';
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                html += `
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded border border-gray-100 text-xs">
+                        <div>
+                            <p class="font-bold text-gray-800">${item.title}</p>
+                            <p class="text-brand-indigo font-bold">${new Intl.NumberFormat('fr-FR').format(item.price)} F</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="updateCartQty(${index}, -1)" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center">-</button>
+                            <span class="font-bold px-1">${item.qty}</span>
+                            <button onclick="updateCartQty(${index}, 1)" class="w-5 h-5 bg-gray-200 text-gray-700 font-bold rounded flex items-center justify-center">+</button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 ml-1"><i class='bx bx-trash'></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            subtotalEl.innerText = new Intl.NumberFormat('fr-FR').format(total) + ' F';
+            totalEl.innerText = new Intl.NumberFormat('fr-FR').format(total) + ' F CFA';
+        }
+
+        function checkoutPOS() {
+            if (cart.length === 0) {
+                showToast('Le panier est vide !', 'warning');
+                return;
+            }
+
+            const customerSelect = document.getElementById('pos-customer-select');
+            const clientName = customerSelect.value;
+            const ref = 'FAC-2026-' + Math.floor(1000 + Math.random() * 9000);
+            let grandTotal = 0;
+
+            let itemsHtml = '';
+            cart.forEach(item => {
+                const lineTotal = item.price * item.qty;
+                grandTotal += lineTotal;
+                itemsHtml += `
+                    <div class="flex justify-between font-bold">
+                        <span>${item.qty}x ${item.title}</span>
+                        <span class="text-brand-indigo">${new Intl.NumberFormat('fr-FR').format(lineTotal)} F</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('inv-ref').innerText = ref;
+            document.getElementById('inv-client').innerText = clientName;
+            document.getElementById('inv-items-list').innerHTML = itemsHtml;
+            document.getElementById('inv-total').innerText = new Intl.NumberFormat('fr-FR').format(grandTotal) + ' FCFA';
+
+            openModal('modal-invoice');
+            showToast(`Vente ${ref} enregistrée avec succès !`, 'success');
+            clearCart();
+        }
+
+        // 6. Category Filter for POS
+        function filterPosCategory(cat) {
+            const items = document.querySelectorAll('.pos-item');
+            items.forEach(item => {
+                if (cat === 'all' || item.getAttribute('data-cat') === cat) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // 7. Generic Table Search Filter
+        function filterTable(tableId, query) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            const rows = table.getElementsByTagName('tr');
+            const q = query.toLowerCase();
+
+            for (let i = 1; i < rows.length; i++) {
+                const text = rows[i].innerText.toLowerCase();
+                rows[i].style.display = text.includes(q) ? '' : 'none';
+            }
+        }
+
+        function handleGlobalSearch(val) {
+            if (val.trim() === '') return;
+            showToast(`Recherche : "${val}"`, 'info');
+        }
+
+        // 8. Chart.js Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            const sparklineOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } },
+                elements: { point: { radius: 0 }, line: { tension: 0.4, borderWidth: 2 } }
+            };
+
+            const sp1 = document.getElementById('sparkline1');
+            if (sp1) {
+                new Chart(sp1.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: ['1', '2', '3', '4', '5', '6', '7'], datasets: [{ data: [10, 25, 20, 45, 30, 50, 65], borderColor: '#ffffff' }] },
+                    options: sparklineOptions
+                });
+            }
+
+            const sp2 = document.getElementById('sparkline2');
+            if (sp2) {
+                new Chart(sp2.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: ['1', '2', '3', '4', '5', '6', '7'], datasets: [{ data: [2, 5, 3, 8, 4, 10, 14], borderColor: '#ffffff' }] },
+                    options: sparklineOptions
+                });
+            }
+
+            const sp3 = document.getElementById('sparkline3');
+            if (sp3) {
+                new Chart(sp3.getContext('2d'), {
+                    type: 'line',
+                    data: { labels: ['1', '2', '3', '4', '5', '6', '7'], datasets: [{ data: [5, 12, 10, 22, 15, 25, 32], borderColor: '#ffffff' }] },
+                    options: sparklineOptions
+                });
+            }
+
+            // Main Area Chart
+            const mainCtx = document.getElementById('mainChart');
+            if (mainCtx) {
+                const ctx = mainCtx.getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(67, 56, 202, 0.2)');
+                gradient.addColorStop(1, 'rgba(67, 56, 202, 0)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet'],
+                        datasets: [{
+                            label: 'Chiffre d\'Affaires (FCFA)',
+                            data: [12500000, 15300000, 14200000, 18500000, 17800000, 22000000],
+                            borderColor: '#4338ca',
+                            backgroundColor: gradient,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#4338ca',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#a3aed1', font: { family: 'Inter', size: 12 } } },
+                            y: {
+                                border: { display: false },
+                                grid: { color: '#f3f4f6', drawBorder: false },
+                                ticks: {
+                                    color: '#a3aed1',
+                                    font: { family: 'Inter', size: 12 },
+                                    callback: function (value) {
+                                        return (value / 1000000) + 'M';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Donut Chart
+            const donutCtx = document.getElementById('donutChart');
+            if (donutCtx) {
+                new Chart(donutCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Apple', 'Samsung', 'Xiaomi', 'Google Pixel'],
+                        datasets: [{
+                            data: [40, 30, 20, 10],
+                            backgroundColor: ['#000000', '#4338ca', '#f97316', '#10b981'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '72%',
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
